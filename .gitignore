@@ -1,0 +1,10 @@
+# Three.js library (use CDN instead)
+three.js/
+
+# Unused/oversized binary files not integrated in the game
+public/textures/saturn.glb
+public/textures/uranus.glb
+scene.glb
+
+# Node
+node_modules/

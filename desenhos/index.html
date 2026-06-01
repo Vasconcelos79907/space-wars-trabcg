@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Drawings</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center, #0d0d2b 0%, #010008 100%);
+      font-family: 'Courier New', monospace;
+      color: #fff;
+    }
+
+    .stars { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+    .star {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: #fff;
+      border-radius: 50%;
+      animation: twinkle 3s infinite alternate;
+    }
+    @keyframes twinkle { from { opacity: 0.2; } to { opacity: 1; } }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color: #00e6cc;
+      text-shadow: 0 0 30px rgba(0,230,204,0.7);
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 48px;
+    }
+
+    /* ── OPTIONS button ── */
+    #btn-options {
+      padding: 14px 48px;
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      font-weight: bold;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #00e6cc;
+      background: rgba(0,0,0,0.5);
+      border: 2px solid rgba(0,230,204,0.6);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.25s, box-shadow 0.25s, border-color 0.25s;
+    }
+    #btn-options:hover {
+      background: rgba(0,230,204,0.10);
+      border-color: rgba(0,230,204,1);
+      box-shadow: 0 0 28px rgba(0,230,204,0.5);
+    }
+    #btn-options:active { transform: scale(0.97); }
+
+    /* ── Dropdown panel ── */
+    #options-panel {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.45s ease, opacity 0.35s ease, margin-top 0.35s ease;
+      margin-top: 0;
+    }
+    #options-panel.open {
+      max-height: 300px;
+      opacity: 1;
+      margin-top: 32px;
+    }
+
+    .btn-row { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+
+    .btn-nav {
+      display: inline-block;
+      padding: 14px 36px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95rem;
+      font-weight: bold;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.25s, box-shadow 0.25s, border-color 0.25s;
+    }
+    .btn-nav:active { transform: scale(0.97); }
+
+    #btn-ufo       { color: #00e6cc; background: rgba(0,0,0,0.5); border: 2px solid rgba(0,230,204,0.6); }
+    #btn-ufo:hover  { background: rgba(0,230,204,0.12); border-color: rgba(0,230,204,1); box-shadow: 0 0 24px rgba(0,230,204,0.5); }
+
+    #btn-rocket      { color: #ff7733; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,119,51,0.6); }
+    #btn-rocket:hover { background: rgba(255,119,51,0.12); border-color: rgba(255,119,51,1); box-shadow: 0 0 24px rgba(255,119,51,0.5); }
+
+    #btn-satelite      { color: #aaccff; background: rgba(0,0,0,0.5); border: 2px solid rgba(170,204,255,0.6); }
+    #btn-satelite:hover { background: rgba(170,204,255,0.12); border-color: rgba(170,204,255,1); box-shadow: 0 0 24px rgba(170,204,255,0.5); }
+
+    #btn-boss2      { color: #ff3344; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,51,68,0.6); }
+    #btn-boss2:hover { background: rgba(255,51,68,0.12); border-color: rgba(255,51,68,1); box-shadow: 0 0 24px rgba(255,51,68,0.5); }
+  </style>
+</head>
+<body>
+
+  <div class="stars" id="stars"></div>
+
+  <div class="container">
+    <h1>3D Drawings</h1>
+    <p class="subtitle">3D objects built with Three.js primitives</p>
+
+    <button id="btn-options" onclick="toggleOptions()">OPTIONS &#9660;</button>
+
+    <div id="options-panel">
+      <div class="btn-row">
+        <button id="btn-ufo"     class="btn-nav" onclick="window.location.href='ufo.html'"     >UFO</button>
+        <button id="btn-rocket"  class="btn-nav" onclick="window.location.href='foguetao.html'">Rocket</button>
+        <button id="btn-satelite" class="btn-nav" onclick="window.location.href='satelite.html'">Satélite</button>
+        <button id="btn-boss2"   class="btn-nav" onclick="window.location.href='boss2.html'"   >BOSS II</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Stars
+    const starsContainer = document.getElementById('stars')
+    for (let i = 0; i < 120; i++) {
+      const star = document.createElement('div')
+      star.className = 'star'
+      star.style.left  = Math.random() * 100 + 'vw'
+      star.style.top   = Math.random() * 100 + 'vh'
+      star.style.animationDelay    = Math.random() * 3 + 's'
+      star.style.animationDuration = (2 + Math.random() * 3) + 's'
+      starsContainer.appendChild(star)
+    }
+
+    // Toggle options panel
+    let open = false
+    function toggleOptions() {
+      open = !open
+      const panel = document.getElementById('options-panel')
+      const btn   = document.getElementById('btn-options')
+      panel.classList.toggle('open', open)
+      btn.innerHTML = open ? 'OPTIONS &#9650;' : 'OPTIONS &#9660;'
+    }
+  </script>
+</body>
+</html>

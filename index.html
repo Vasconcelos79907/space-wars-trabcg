@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Space Wars</title>
+
+  <link rel="stylesheet" href="styles/style.css">
+  <script async src="https://unpkg.com/es-module-shims@2.0.10/dist/es-module-shims.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.183.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.183.1/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+
+<body>
+
+  <div id="background"></div>
+
+  <!-- MENU BACKGROUND CANVAS -->
+  <canvas id="menuBg"></canvas>
+  <div id="menuOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.04); z-index:0; pointer-events:none;"></div>
+
+  <div id="menu">
+    <h1>Space Wars</h1>
+    <div id="menuSubtitle">Conquer the galaxy</div>
+    <div id="menuDivider"></div>
+
+    <button id="startBtn">PLAY</button>
+    <button id="rulesBtn">RULES</button>
+    <button id="shipBtn">CHOOSE SHIP</button>
+    <button id="conquestBtn">ACHIEVEMENTS</button>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+  <canvas id="worldCanvas" style="display:none;"></canvas>
+
+  <!-- LOADING SCREEN -->
+  <div id="loadingScreen" style="display:none;">
+    <div id="loadingLabel">LOADING</div>
+    <div id="loadingBarBg"><div id="loadingBar"></div></div>
+    <div id="loadingPercent">0%</div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" style="display:none;">
+
+    <!-- Top Left column: Objective + Score + Powerups -->
+    <div id="hudLeft">
+      <div id="hudObjective">
+        <div id="hudObjectiveLabel">OBJETIVO</div>
+        <div id="hudObjectiveText">Destruir naves inimigas</div>
+      </div>
+      <div id="hudScore">SCORE: <span id="scoreValue">0</span></div>
+      <div id="powerupHud"></div>
+      <div id="xpHud">
+        <div id="xpLabel">LVL <span id="xpLevel">1</span></div>
+        <div id="xpBarBg"><div id="xpBarFill"></div></div>
+      </div>
+    </div>
+
+    <!-- Top Right: Nav data -->
+    <div id="hudNav">
+      <div class="hudNavItem">
+        <div class="hudNavLabel">VELOCIDADE</div>
+        <div class="hudNavValue" id="hudVelocity">0 m/s</div>
+      </div>
+      <div class="hudNavItem">
+        <div class="hudNavLabel">ALTITUDE</div>
+        <div class="hudNavValue" id="hudAltitude">420 KM</div>
+      </div>
+    </div>
+
+    <!-- Bottom Left: Shield & Integrity -->
+    <div id="hudStats">
+      <div class="hudStatRow">
+        <span class="hudStatIcon">&#9670;</span>
+        <span class="hudStatLabel">ESCUDO</span>
+        <div class="hudStatBarBg"><div class="hudStatBarFill" id="shieldBar" style="width:100%"></div></div>
+        <span class="hudStatPct" id="shieldPct">100%</span>
+      </div>
+      <div class="hudStatRow">
+        <span class="hudStatIcon">&#43;</span>
+        <span class="hudStatLabel">INTEGRIDADE</span>
+        <div class="hudStatBarBg"><div class="hudStatBarFill" id="integrityBar" style="width:100%"></div></div>
+        <span class="hudStatPct" id="integrityPct">100%</span>
+      </div>
+    </div>
+
+    <!-- Bottom Right: Weapon -->
+    <div id="hudWeapon">
+      <div id="hudWeaponName">LASER</div>
+      <div id="hudWeaponAmmo">&#8734;</div>
+      <div id="hudWeaponBar"><div id="hudWeaponBarFill"></div></div>
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div id="gameOverScreen" style="display:none;">
+    <h2>GAME OVER</h2>
+    <div id="goScore"></div>
+    <div id="goBestScore"></div>
+    <button id="restartBtn">PLAY AGAIN</button>
+    <button id="goMenuBtn">MAIN MENU</button>
+  </div>
+
+  <!-- COUNTDOWN -->
+  <div id="countdownOverlay" style="display:none;">
+    <div id="countdownText"></div>
+  </div>
+
+  <!-- PAUSE BUTTON -->
+  <button id="pauseBtn" style="display:none;">☰</button>
+
+  <!-- PAUSE OVERLAY -->
+  <div id="pauseOverlay" style="display:none;">
+    <div id="pausePanel">
+      <div id="pauseTitle">PAUSED</div>
+      <button id="continueBtn">CONTINUE</button>
+      <button id="mainMenuBtn">MAIN MENU</button>
+      <div id="soundRow">
+        <button id="sfxBtn">🔊 SFX</button>
+        <button id="musicBtn">🔊 MUSIC</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGRAS -->
+  <div id="rulesScreen" style="display: none;">
+    <h2>Game Rules</h2>
+
+    <p>🎮 Power-ups:</p>
+    <p>🔫 Double shot</p>
+    <p>⚡ Rapid fire</p>
+    <p>🛡️ Shield</p>
+    <p>💥 Stronger shot</p>
+
+    <br>
+
+    <p>🔧 How it works:</p>
+    <p>Power-ups fall from the top</p>
+    <p>Activated by touching your ship</p>
+    <p>Some are temporary</p>
+
+    <br>
+
+    <p>👾 Objective:</p>
+    <p>Survive the alien attacks</p>
+    <p>Don't lose all your lives</p>
+    <p>Defeat aliens to advance</p>
+    <p>Face the final boss</p>
+
+    <button id="backBtn">BACK</button>
+  </div>
+
+  <!-- NAVES -->
+  <div id="shipScreen" style="display: none;">
+
+    <!-- Full-screen 3D viewer -->
+    <div id="shipDisplayArea">
+      <div id="hangarScan"></div>
+      <div id="mainViewer">
+        <canvas id="shipCanvas"></canvas>
+      </div>
+      <div id="platformGlow">
+        <div class="holoRing" id="holoRing1"></div>
+        <div class="holoRing" id="holoRing2"></div>
+        <div class="holoRing" id="holoRing3"></div>
+      </div>
+      <div id="hangarHint">&#9664; &#9654;&nbsp;&nbsp;OR CLICK A SHIP TO SELECT</div>
+      <button id="leftBtn" class="hangarNavBtn hangarNavLeft">&#9664;</button>
+      <button id="rightBtn" class="hangarNavBtn hangarNavRight">&#9654;</button>
+    </div>
+
+    <!-- Top bar overlay -->
+    <div id="hangarTopBar">
+      <button id="backShipBtn">&#9664; BACK</button>
+      <div id="hangarTitle">&#9881;&nbsp; HANGAR &middot; FLEET MANAGEMENT</div>
+      <div></div>
+    </div>
+
+    <!-- Left info panel overlay -->
+    <div id="hangarLeftPanel">
+      <div id="statsHeader"><span id="shipClassName">INTERCEPTOR</span><span id="shipClassDot">&#9679;</span></div>
+      <div id="shipFullName">VIPER MK2</div>
+      <div id="shipDesc"></div>
+      <div id="shipTelemetry"><span id="telemetryText">SYS READY</span></div>
+      <div class="statRow">
+        <span class="statLabel">SPEED</span>
+        <div class="statBarBg"><div class="statBarFill" id="stat-speed"></div></div>
+        <span class="statValue" id="val-speed">80</span>
+      </div>
+      <div class="statRow">
+        <span class="statLabel">FIREPOWER</span>
+        <div class="statBarBg"><div class="statBarFill" id="stat-firepower"></div></div>
+        <span class="statValue" id="val-firepower">65</span>
+      </div>
+      <div class="statRow">
+        <span class="statLabel">SHIELD</span>
+        <div class="statBarBg"><div class="statBarFill" id="stat-shield"></div></div>
+        <span class="statValue" id="val-shield">55</span>
+      </div>
+      <div class="statRow">
+        <span class="statLabel">AGILITY</span>
+        <div class="statBarBg"><div class="statBarFill" id="stat-agility"></div></div>
+        <span class="statValue" id="val-agility">90</span>
+      </div>
+    </div>
+
+    <!-- Right specs panel overlay -->
+    <div id="hangarRightPanel">
+      <div id="hangarRightTitle">SHIP INFO</div>
+      <div class="specRow">
+        <span class="specLabel">CLASS</span>
+        <span class="specValue" id="spec-class">INTERCEPTOR</span>
+      </div>
+      <div class="specRow">
+        <span class="specLabel">UNLOCK</span>
+        <span class="specValue" id="spec-unlock">LVL 1</span>
+      </div>
+      <div class="specRow">
+        <span class="specLabel">ROLE</span>
+        <span class="specValue" id="spec-role">ASSAULT</span>
+      </div>
+    </div>
+
+    <!-- Bottom bar: thumbnails + LAUNCH -->
+    <div id="shipBottomBar">
+      <div id="shipPreview"><!-- generated by JS --></div>
+      <button id="selectBtn">LAUNCH</button>
+    </div>
+
+  </div>
+
+<!-- ACHIEVEMENTS SCREEN -->
+<div id="achievementsScreen" style="display:none;">
+  <div id="achHeader">
+    <button id="backAchBtn">&#9664; BACK</button>
+    <div id="achTitle">&#127942; &nbsp;A C H I E V E M E N T S</div>
+    <div id="achCount"></div>
+  </div>
+  <div id="achProgressBar"><div id="achProgressFill"></div></div>
+  <div id="achievementsList"></div>
+</div>
+
+<!-- SCREEN FLASH -->
+<div id="screenFlash"></div>
+
+<!-- BOSS WARNING CINEMATIC -->
+<div id="bossWarning">
+  <div id="bossWarningTop">&#9888; WARNING &#9888;</div>
+  <div id="bossWarningTitle">UNKNOWN ENTITY DETECTED</div>
+  <div id="bossWarningSub">COMBAT ALERT &middot; ALL SYSTEMS ACTIVE</div>
+</div>
+
+<!-- COMBO DISPLAY -->
+<div id="comboDisplay"></div>
+
+<!-- KILL STREAK -->
+<div id="killStreakDisplay"></div>
+
+<!-- DAMAGE NUMBERS CONTAINER -->
+<div id="damageNumbers"></div>
+
+<!-- 🔥 ISTO FALTAVA -->
+<script type="module" src="./main.js"></script>
+
+</body>
+</html> 

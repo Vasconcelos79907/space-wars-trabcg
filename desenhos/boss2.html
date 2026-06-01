@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BOSS II – 3D Viewer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; background: #000000; }
+    canvas { display: block; }
+
+    #back-btn {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 10;
+      padding: 7px 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: #ff3344;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 51, 68, 0.5);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    #back-btn:hover {
+      border-color: rgba(255, 51, 68, 1);
+      box-shadow: 0 0 12px rgba(255, 51, 68, 0.5);
+    }
+
+    #info {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+    }
+  </style>
+
+  <script async="" src="https://unpkg.com/es-module-shims@2.0.10/dist/es-module-shims.js"></script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.173/build/three.module.js",
+        "OrbitControls": "https://unpkg.com/three@0.173/examples/jsm/controls/OrbitControls.js"
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <button id="back-btn" onclick="window.location.href='index.html'">&#9664;&nbsp; BACK</button>
+  <canvas id="canvas"></canvas>
+  <div id="info">DRAG to rotate &nbsp;|&nbsp; SCROLL to zoom &nbsp;|&nbsp; RIGHT-DRAG to pan</div>
+
+  <script type="module" src="js/boss2.js"></script>
+
+</body>
+</html>
