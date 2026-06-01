@@ -1,4 +1,4 @@
-# Three.js library (use CDN instead)
+# Full three.js repo (use lib/ instead)
 three.js/
 
 # Unused/oversized binary files not integrated in the game
